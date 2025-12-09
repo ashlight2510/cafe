@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>카페 지출 총자산 역전 계산기</title>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      background: radial-gradient(circle at top, #2b2b2b 0, #050505 55%);
+      color: #f7f7f7;
+      text-align: center;
+    }
+    h1 {
+      font-size: 26px;
+      margin: 10px 0 4px;
+    }
+    .subtitle {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-bottom: 16px;
+    }
+    .card {
+      max-width: 480px;
+      margin: 0 auto;
+      background: rgba(15, 15, 15, 0.95);
+      border-radius: 18px;
+      padding: 20px 18px 22px;
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(10px);
+    }
+    label {
+      display: block;
+      text-align: left;
+      font-size: 14px;
+      margin-top: 10px;
+      margin-bottom: 6px;
+    }
+    input {
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 10px;
+      border: 1px solid #333;
+      font-size: 15px;
+      background: #111;
+      color: #f7f7f7;
+      outline: none;
+    }
+    input:focus {
+      border-color: #ffb347;
+      box-shadow: 0 0 0 1px rgba(255, 179, 71, 0.4);
+    }
+    .hint {
+      font-size: 11px;
+      opacity: 0.6;
+      margin-top: 2px;
+      text-align: left;
+    }
+    button {
+      width: 100%;
+      margin-top: 16px;
+      padding: 13px 14px;
+      border-radius: 12px;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      background: linear-gradient(135deg, #ffb347, #ff7e5f);
+      color: #111;
+      cursor: pointer;
+      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out,
+        filter 0.1s;
+      box-shadow: 0 10px 20px rgba(255, 126, 95, 0.4);
+    }
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+      box-shadow: 0 14px 24px rgba(255, 126, 95, 0.55);
+    }
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 6px 14px rgba(255, 126, 95, 0.35);
+    }
+
+    #result {
+      margin-top: 20px;
+      padding: 14px 14px 6px;
+      background: #101010;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      display: none;
+      text-align: left;
+      font-size: 14px;
+    }
+    #result h2 {
+      margin: 0 0 6px;
+      font-size: 18px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      margin-bottom: 8px;
+    }
+    .big-number {
+      font-size: 20px;
+      font-weight: 700;
+      color: #ffd86b;
+      margin: 4px 0 6px;
+    }
+    .sub-number {
+      font-size: 13px;
+      opacity: 0.86;
+      margin-bottom: 4px;
+    }
+    .divider {
+      margin: 10px 0;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+    }
+    .meme {
+      margin-top: 10px;
+      font-size: 13px;
+      opacity: 0.8;
+      font-style: italic;
+    }
+    .compare-list {
+      margin: 6px 0 4px;
+      padding-left: 16px;
+    }
+    .compare-list li {
+      margin-bottom: 2px;
+    }
+    .copy-btn {
+      margin-top: 10px;
+      padding: 9px 11px;
+      border-radius: 9px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      font-size: 13px;
+      background: rgba(255, 255, 255, 0.03);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .small-note {
+      margin-top: 8px;
+      font-size: 11px;
+      opacity: 0.55;
+    }
+    footer {
+      margin-top: 26px;
+      font-size: 11px;
+      opacity: 0.4;
+    }
+  </style>
+</head>
+<body>
+  <h1>💸 카페 지출 총자산 역전 계산기</h1>
+  <div class="subtitle">"그 작은 기쁨이라도 뺏지 마세요…" 라고 말하기 전에 한 번만 눌러보기</div>
+
+  <div class="card">
+    <label for="cupsPerDay">하루 평균 커피 개수 ☕</label>
+    <input type="number" id="cupsPerDay" placeholder="예: 2" min="0" step="0.1" />
+    <div class="hint">아이스 아메리카노, 라떼, 디카페인 다 포함해서 대략 몇 잔인지</div>
+
+    <label for="pricePerCup">한 잔당 평균 가격 (원)</label>
+    <input type="number" id="pricePerCup" placeholder="예: 4500" min="0" step="100" />
+    <div class="hint">브랜드 카페/편의점/프랜차이즈 섞어서 체감 평균가</div>
+
+    <label for="age">현재 나이</label>
+    <input type="number" id="age" placeholder="예: 27" min="10" max="80" />
+    <div class="hint">20살부터 이 패턴이었다고 가정해서 계산해요</div>
+
+    <button onclick="calculate()">계산하기</button>
+
+    <div id="result">
+      <div class="pill">☕ 카페 지출 리포트</div>
+      <h2 id="headline"></h2>
+
+      <div id="summaryBlock">
+        <div class="big-number" id="totalTo30"></div>
+        <div class="sub-number" id="breakdown"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div id="compareBlock">
+        <div style="margin-bottom:4px;">이 돈이면 이 정도가 가능합니다:</div>
+        <ul class="compare-list" id="compareList"></ul>
+      </div>
+
+      <div class="meme" id="memeLine"></div>
+
+      <button class="copy-btn" onclick="copyResult()">
+        📋 결과 문구 복사하기
+      </button>
+
+      <div class="small-note">
+        * 아주 대략적인 계산이에요. 인생을 후회하라고 만든 게 아니라, 그냥 한 번 웃어보라고 만든 장난감입니다.
+      </div>
+    </div>
+  </div>
+
+  <footer>© 2025 카페 지출 총자산 역전 연구소</footer>
+
+  <script>
+    function formatKRW(num) {
+      return num.toLocaleString("ko-KR") + "원";
+    }
+
+    function calculate() {
+      const cups = parseFloat(document.getElementById("cupsPerDay").value);
+      const price = parseFloat(document.getElementById("pricePerCup").value);
+      const age = parseInt(document.getElementById("age").value, 10);
+
+      if (!cups || !price || !age) {
+        alert("하루 커피 개수, 잔당 가격, 현재 나이를 모두 입력해주세요!");
+        return;
+      }
+
+      const startAge = 20;
+      const targetAge = 30;
+
+      // 연 기준
+      const dailySpend = cups * price;
+      const yearlySpend = dailySpend * 365;
+
+      // 현재 나이 기준으로 20~30살 사이 커피 지출 추정
+      const yearsSoFar = Math.max(0, Math.min(age, targetAge) - startAge);
+      const yearsFuture =
+        age < targetAge ? Math.max(0, targetAge - Math.max(age, startAge)) : 0;
+      const totalYears = Math.max(0, Math.min(targetAge, Math.max(age, targetAge)) - startAge);
+
+      const spentSoFar = yearlySpend * yearsSoFar;
+      const willSpend = yearlySpend * yearsFuture;
+      const totalTo30 = yearlySpend * totalYears;
+
+      const headlineEl = document.getElementById("headline");
+      const totalTo30El = document.getElementById("totalTo30");
+      const breakdownEl = document.getElementById("breakdown");
+      const compareListEl = document.getElementById("compareList");
+      const memeLineEl = document.getElementById("memeLine");
+      const resultBox = document.getElementById("result");
+
+      // 헤드라인
+      if (age < targetAge) {
+        headlineEl.innerText = `${targetAge}살까지 커피로 태울 예정 금액`;
+      } else if (age === targetAge) {
+        headlineEl.innerText = `${targetAge}살까지 커피로 태운 금액`;
+      } else {
+        headlineEl.innerText = `20살부터 30살까지 커피로 태웠을 금액`;
+      }
+
+      totalTo30El.innerText = formatKRW(Math.round(totalTo30));
+
+      let breakdownText = "";
+      if (yearsSoFar > 0) {
+        breakdownText += `지금까지 대략 ${formatKRW(Math.round(spentSoFar))}`;
+      }
+      if (yearsFuture > 0) {
+        if (breakdownText) breakdownText += " + ";
+        breakdownText += `앞으로 ${formatKRW(Math.round(willSpend))}`;
+      }
+      if (!breakdownText) {
+        breakdownText = "계산 가정: 20살부터 30살까지 같은 패턴으로 마신다고 가정했어요.";
+      }
+      breakdownText += ` (연간 약 ${formatKRW(Math.round(yearlySpend))} 수준)`;
+      breakdownEl.innerText = breakdownText;
+
+      // 비교 항목 (치킨, 맥북, 택시, 여행 등)
+      compareListEl.innerHTML = "";
+      const chickenPrice = 20000;
+      const macbookPrice = 2000000;
+      const taxiPrice = 10000;
+      const tripPrice = 800000;
+
+      const chickens = Math.floor(totalTo30 / chickenPrice);
+      const macbooks = Math.floor(totalTo30 / macbookPrice);
+      const taxis = Math.floor(totalTo30 / taxiPrice);
+      const trips = Math.floor(totalTo30 / tripPrice);
+
+      if (chickens > 0) {
+        const li = document.createElement("li");
+        li.textContent = `치킨 약 ${chickens.toLocaleString("ko-KR")}마리`;
+        compareListEl.appendChild(li);
+      }
+      if (macbooks > 0) {
+        const li = document.createElement("li");
+        li.textContent = `맥북 프로 약 ${macbooks.toLocaleString("ko-KR")}대`;
+        compareListEl.appendChild(li);
+      }
+      if (taxis > 0) {
+        const li = document.createElement("li");
+        li.textContent = `택시 기본요금 약 ${taxis.toLocaleString("ko-KR")}번`;
+        compareListEl.appendChild(li);
+      }
+      if (trips > 0) {
+        const li = document.createElement("li");
+        li.textContent = `해외 왕복 항공권(체감) 약 ${trips.toLocaleString("ko-KR")}번`;
+        compareListEl.appendChild(li);
+      }
+      if (!compareListEl.children.length) {
+        const li = document.createElement("li");
+        li.textContent = "아직은… 귀여운 수준이에요. 마음 편히 마셔도 됩니다.";
+        compareListEl.appendChild(li);
+      }
+
+      // 밈 문구
+      const memeLines = [
+        "그 작은 기쁨이라도 뺏지 마세요… 하지만 가끔은 텀블러를 들어보는 것도…?",
+        "인생은 짧고 카페인은 달지만, 통장도 같이 말라가고 있습니다.",
+        "오늘도 당신의 행복과 총자산은 서로 반비례 중입니다.",
+        "그래도 이 돈으로 행복을 샀다면… 뭐, 나쁜 거래는 아니었죠?",
+        "커피 한 잔의 여유, 통장 한 줄의 눈물."
+      ];
+      memeLineEl.innerText =
+        memeLines[Math.floor(Math.random() * memeLines.length)];
+
+      resultBox.style.display = "block";
+    }
+
+    function copyResult() {
+      const headline = document.getElementById("headline").innerText;
+      const total = document.getElementById("totalTo30").innerText;
+      const breakdown = document.getElementById("breakdown").innerText;
+      const meme = document.getElementById("memeLine").innerText;
+
+      const text = `💸 카페 지출 총자산 역전 계산기 결과\n\n` +
+        `${headline}\n➡ ${total}\n${breakdown}\n\n` +
+        `${meme}\n\n(나도 해보기 👉 ${window.location.href})`;
+
+      navigator.clipboard
+        .writeText(text)
+        .then(() => {
+          alert("결과 문구가 클립보드에 복사되었습니다!");
+        })
+        .catch(() => {
+          alert("복사에 실패했어요. 직접 드래그해서 복사해주세요!");
+        });
+    }
+  </script>
+</body>
+</html>
+

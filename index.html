@@ -519,7 +519,7 @@
         originalPlaceholder.set(el, el.placeholder || "");
       });
 
-      const defaultLang = "en";
+      const defaultLang = "ko";
       let currentLang = defaultLang;
 
       function t(key, vars = {}) {
@@ -573,31 +573,20 @@
         }
       }
 
-      function getRegionPreferredLang(fallback = defaultLang) {
-        const intlLocale =
-          typeof Intl === "object" && typeof Intl.DateTimeFormat === "function"
-            ? Intl.DateTimeFormat().resolvedOptions().locale
-            : "";
-        const sources = [
-          ...(navigator.languages || []),
-          navigator.language,
-          navigator.userLanguage,
-          intlLocale,
-        ]
-          .filter(Boolean)
-          .map((locale) => locale.toLowerCase());
-        const hasKorean = sources.some((locale) => locale.startsWith("ko"));
-        return hasKorean ? "ko" : fallback;
-      }
-
       function detectLang() {
         const params = new URLSearchParams(window.location.search);
         const paramLang = params.get("lang");
         if (translations[paramLang]) return paramLang;
         const stored = localStorage.getItem("preferredLang");
         if (translations[stored]) return stored;
-        const autoLang = getRegionPreferredLang(defaultLang);
-        return translations[autoLang] ? autoLang : defaultLang;
+        const browserLang =
+          navigator.languages && navigator.languages.length
+            ? navigator.languages[0]
+            : navigator.language;
+        if (browserLang && browserLang.toLowerCase().startsWith("ko")) {
+          return "ko";
+        }
+        return defaultLang;
       }
 
       window.__cafeI18n = {

@@ -534,25 +534,15 @@
       }
 
       function applyTranslations() {
-        const isEnglish = currentLang === "en";
-
-        document.title = isEnglish ? t("metaTitle") : originalTitle;
+        document.title = t("metaTitle");
         document.documentElement.lang = currentLang;
 
         document.querySelectorAll("[data-i18n]").forEach((el) => {
-          if (isEnglish) {
-            el.textContent = t(el.dataset.i18n);
-          } else if (originalText.has(el)) {
-            el.textContent = originalText.get(el);
-          }
+          el.textContent = t(el.dataset.i18n);
         });
 
         document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
-          if (isEnglish) {
-            el.placeholder = t(el.dataset.i18nPlaceholder);
-          } else if (originalPlaceholder.has(el)) {
-            el.placeholder = originalPlaceholder.get(el);
-          }
+          el.placeholder = t(el.dataset.i18nPlaceholder);
         });
       }
 
@@ -565,6 +555,17 @@
           button.classList.toggle("active", button.dataset.lang === nextLang);
         });
         applyTranslations();
+        
+        // 결과가 이미 표시되어 있다면 다시 계산하여 번역 적용
+        const resultBox = document.getElementById("result");
+        if (resultBox && resultBox.style.display !== "none") {
+          const cups = parseFloat(document.getElementById("cupsPerDay").value);
+          const price = parseFloat(document.getElementById("pricePerCup").value);
+          const age = parseInt(document.getElementById("age").value, 10);
+          if (cups && price && age) {
+            calculate();
+          }
+        }
 
         if (options.updateUrl) {
           const url = new URL(window.location.href);

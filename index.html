@@ -522,6 +522,12 @@
       function applyTranslations() {
         document.title = t("metaTitle");
         document.documentElement.lang = currentLang;
+        
+        // Update meta description if exists
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) {
+          metaDesc.setAttribute("content", t("subtitle"));
+        }
 
         document.querySelectorAll("[data-i18n]").forEach((el) => {
           el.textContent = t(el.dataset.i18n);

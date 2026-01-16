@@ -500,24 +500,10 @@
         },
       };
 
-      const originalTitle = document.title;
-      const originalText = new Map();
-      const originalPlaceholder = new Map();
-
       function registerDynamicTextElement(el, key, fallbackText) {
         if (!el || !key) return;
         el.dataset.i18n = key;
-        if (!originalText.has(el)) {
-          originalText.set(el, fallbackText ?? el.textContent);
-        }
       }
-
-      document.querySelectorAll("[data-i18n]").forEach((el) => {
-        originalText.set(el, el.textContent);
-      });
-      document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
-        originalPlaceholder.set(el, el.placeholder || "");
-      });
 
       const defaultLang = "ko";
       let currentLang = defaultLang;
